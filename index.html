@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bulk Trade Lore Generator</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0e0e0e;
+  color: #f3f3f3;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 0;
+}
+
+h1 {
+  font-size: 2.8em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  text-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+}
+
+.subtitle {
+  color: #888;
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+.controls {
+  background: #1a1a1a;
+  padding: 30px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-weight: 500;
+  font-size: 0.95em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input, select {
+  width: 100%;
+  padding: 12px 18px;
+  background: #0e0e0e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #f3f3f3;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+}
+
+input::placeholder {
+  color: #555;
+}
+
+.tone-select {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.tone-btn {
+  padding: 12px;
+  background: #0e0e0e;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #f3f3f3;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tone-btn:hover {
+  border-color: #667eea;
+  box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
+}
+
+.tone-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-color: #667eea;
+  box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 20px;
+}
+
+.generate-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn:active {
+  transform: translateY(0);
+}
+
+.output-section {
+  background: #1a1a1a;
+  padding: 35px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.output-section.visible {
+  display: block;
+}
+
+.story-title {
+  font-size: 1.8em;
+  color: #667eea;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.story-content {
+  font-size: 1.1em;
+  line-height: 1.9;
+  color: #ddd;
+  text-align: justify;
+}
+
+.story-content p {
+  margin-bottom: 20px;
+}
+
+.captions {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 2px solid #333;
+}
+
+.caption-title {
+  color: #667eea;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.caption-text {
+  background: #0e0e0e;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  color: #aaa;
+  font-size: 0.95em;
+  border-left: 3px solid #667eea;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.caption-text:hover {
+  background: #1a1a1a;
+  color: #f3f3f3;
+  border-left-color: #764ba2;
+}
+
+footer {
+  text-align: center;
+  margin-top: auto;
+  padding: 30px 0;
+  color: #555;
+  font-size: 0.9em;
+}
+
+footer a {
+  color: #667eea;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: #764ba2;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2em;
+  }
+  
+  .controls, .output-section {
+    padding: 20px;
+  }
+  
+  .tone-select {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Bulk Trade Lore Generator</h1>
+    <p class="subtitle">Forge epic tales from the digital frontier</p>
+  </header>
+
+  <div class="controls">
+    <div class="input-group">
+      <label for="protagonist">Username Discord / X</label>
+      <input type="text" id="protagonist" placeholder="Enter your username or leave blank for 'The Trader'">
+    </div>
+
+    <div class="input-group">
+      <label for="theme">Story Theme</label>
+      <input type="text" id="theme" placeholder="e.g., 'first cross-chain swap', 'liquidity crisis', 'validator uprising'">
+    </div>
+
+    <div class="input-group">
+      <label for="wordCount">Target Word Count</label>
+      <input type="number" id="wordCount" placeholder="Enter target word count (default: 300)" min="100" max="1000" value="300">
+    </div>
+
+    <div class="input-group">
+      <label>Story Tone</label>
+      <div class="tone-select">
+        <button class="tone-btn active" data-tone="visionary">Visionary</button>
+        <button class="tone-btn" data-tone="heroic">Heroic</button>
+        <button class="tone-btn" data-tone="mysterious">Mysterious</button>
+        <button class="tone-btn" data-tone="playful">Playful</button>
+      </div>
+    </div>
+
+    <button class="generate-btn" onclick="generateLore()">Generate Story</button>
+  </div>
+
+  <div class="output-section" id="output">
+    <h2 class="story-title" id="storyTitle"></h2>
+    <div class="story-content" id="storyContent"></div>
+    
+    <div class="captions">
+      <div>
+        <div class="caption-title">🎮 Discord Banner</div>
+        <div class="caption-text" id="discordCaption" onclick="copyToClipboard('discordCaption')"></div>
+      </div>
+      
+      <div>
+        <div class="caption-title">🐦 Tweet</div>
+        <div class="caption-text" id="tweetCaption" onclick="copyToClipboard('tweetCaption')"></div>
+      </div>
+      
+      <div>
+        <div class="caption-title">✨ Signature</div>
+        <div class="caption-text" id="signatureCaption" onclick="copyToClipboard('signatureCaption')"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Created by <a href="https://x.com/0xdhyzal" target="_blank"><strong>0xPamanSam | EVM</strong></a> | Inspired by <a href="https://x.com/bulktrade" target="_blank">Bulk Trade</a>
+>>>>
+</footer>
+
+<script>
+// Story fragment banks for each tone
+const storyFragments = {
+  visionary: {
+    openings: [
+      "In the dawn of decentralized markets, a new paradigm emerged from the chaos of legacy systems.",
+      "The old world of centralized exchanges crumbled as algorithmic truth rewrote the rules of value.",
+      "Across the infinite digital expanse, order books began to sing a new song of freedom.",
+      "When the first cross-chain bridge ignited, humanity glimpsed the future of boundless liquidity.",
+      "From the ashes of traditional finance, a phoenix of peer-to-peer exchange took flight.",
+      "The validators stood watch as a new economy unfolded across a thousand blockchains.",
+      "In the quantum foam of the mempool, destinies were forged by those who dared to trade.",
+      "The great convergence arrived not with fanfare, but with the quiet hum of matching engines."
+    ],
+    middles: [
+      "Order books stretched like rivers of pure potential, each bid and ask a droplet in the ocean of value.",
+      "Liquidity flowed through channels invisible to the old guard, carving new pathways through digital stone.",
+      "The matching engines operated with lightning precision, connecting buyers and sellers across dimensions.",
+      "Smart contracts whispered promises that no human institution could ever guarantee.",
+      "Cross-chain bridges hummed with activity, weaving disparate ecosystems into a single tapestry.",
+      "Validators maintained their eternal vigil, ensuring each transaction reflected mathematical truth.",
+      "The order flow became a constellation, each trade a star in an ever-expanding universe.",
+      "Slippage melted away as liquidity aggregators unified fragmented markets into coherent wholes.",
+      "The mempool churned with transactions, a perpetual motion machine of economic activity.",
+      "Gas fees became footnotes in a story written by those who understood efficiency.",
+      "The oracle networks delivered truth faster than light, anchoring digital value to reality.",
+      "Automated market makers balanced equations that Wall Street could never solve.",
+      "The ledger grew with each block, an immutable chronicle of human exchange.",
+      "Price discovery occurred at the speed of thought, algorithms dancing with market psychology.",
+      "The network effect compounded daily, each new trader strengthening the collective whole.",
+      "Risk management protocols operated invisibly, guardian angels of capital preservation.",
+      "The bonding curves traced elegant mathematics across charts of green and red.",
+      "Governance tokens represented not just value, but the voice of the community.",
+      "Flash loans demonstrated the power of code to reshape temporal constraints.",
+      "The consensus mechanisms hummed in harmony, a distributed choir of validation."
+    ],
+    closings: [
+      "And so the future arrived, not through revolution, but through the quiet persistence of better systems.",
+      "The old world watched in wonder as a new economy emerged from mathematical certainty.",
+      "This was not the end of markets, but their apotheosis into something transcendent.",
+      "The dream of trustless exchange became reality, one block at a time.",
+      "In the end, code proved mightier than institutions, and algorithms more just than judges.",
+      "The revolution would not be centralized, and the future belonged to those who understood.",
+      "Thus began the age of infinite liquidity, where value flowed like water seeking its level.",
+      "The legacy systems could only watch as their successors wrote a more elegant chapter."
+    ]
+  },
+  
+  heroic: {
+    openings: [
+      "The battle for decentralized markets began not with a whisper, but with a thunderous declaration.",
+      "Against impossible odds, the first traders stormed the gates of centralized control.",
+      "In the darkest hour of market manipulation, a champion emerged wielding algorithms of light.",
+      "The war against inefficiency demanded warriors willing to risk everything for transparent exchange.",
+      "From the trenches of the mempool, heroes rose to challenge the monopolies of old finance.",
+      "When the validators were under siege, one trader stood alone against the forces of corruption.",
+      "The call to arms echoed across every blockchain: 'Decentralize or die!'",
+      "In the arena of order books, only the boldest survived the brutal dance of bid and ask."
+    ],
+    middles: [
+      "The protagonist charged through walls of sell orders, determination burning brighter than any candle.",
+      "Each trade was a strike against tyranny, each successful swap a victory for freedom.",
+      "The matching engines roared to life, their algorithms wielding power beyond mortal comprehension.",
+      "Liquidity pools became battlegrounds where fortunes were won and lost in microseconds.",
+      "The enemy's front-running bots fell one by one to superior strategy and ironclad resolve.",
+      "Cross-chain bridges became lifelines, evacuating value from hostile territory to safety.",
+      "The validators held the line against 51% attacks, their nodes standing firm like ancient oaks.",
+      "Smart contracts executed with military precision, no room for error or hesitation.",
+      "The oracle feeds delivered intelligence from enemy territories, crucial data for strategic advantage.",
+      "Slippage tolerance was set to zero—there would be no retreat, no surrender.",
+      "The mempool became a maelstrom of conflicting orders, chaos incarnate.",
+      "Gas wars erupted as traders competed for block inclusion, paying premium for priority.",
+      "The bonding curves were breached, price discovery happening at breakneck velocity.",
+      "Automated defenses activated, protecting liquidity pools from predatory arbitrage.",
+      "The network hashrate climbed as more soldiers joined the righteous cause.",
+      "Flash loans became weapons of mass disruption, reshaping markets in single blocks.",
+      "The governance vote was a referendum on the soul of decentralization itself.",
+      "MEV bots prowled like sharks, but the hero's transactions were encrypted and invisible.",
+      "The final confrontation occurred in the dark forest of the mempool.",
+      "Victory was measured not in dollars, but in principles preserved and systems strengthened."
+    ],
+    closings: [
+      "When the dust settled, decentralization had triumphed, and the old guard lay defeated.",
+      "The hero's name became legend, whispered in trading channels across a thousand networks.",
+      "This was not merely a win—it was the beginning of a new epoch in human commerce.",
+      "The battle was won, but the war for true decentralization had only just begun.",
+      "Against all odds, one trader proved that code and conviction could topple empires.",
+      "The victory bells rang across every blockchain, announcing the dawn of trustless exchange.",
+      "Thus ended the first chapter in the greatest market revolution ever witnessed.",
+      "The hero vanished into the mists of pseudonymity, but their legacy lived on forever."
+    ]
+  },
+  
+  mysterious: {
+    openings: [
+      "In the liminal space between blocks, where time folds upon itself, the story unfolds.",
+      "The oracle spoke in riddles, and only those who listened with their soul could understand.",
+      "Beneath the visible layer of order books, a hidden architecture pulsed with ancient knowledge.",
+      "The Trader walked through markets that existed in probability spaces, not physical reality.",
+      "In the quantum substrate of the blockchain, all trades exist simultaneously until observed.",
+      "The validators dreamed in cryptographic hashes, their visions revealing truths beyond comprehension.",
+      "Where the mempool meets the void, there the secret protocols whisper their eternal song.",
+      "The first transaction contained a message encoded in gas limits—a prophecy of what was to come."
+    ],
+    middles: [
+      "Liquidity flowed like mercury through channels that mathematics could describe but never explain.",
+      "The matching engines operated beyond the speed of light, drawing power from dimensions unnamed.",
+      "Each block contained not just transactions, but fragments of a cosmic algorithm.",
+      "The order flow traced patterns recognized by ancient civilizations, fractals of human desire.",
+      "Cross-chain bridges were not built—they were discovered, existing in the space between protocols.",
+      "The smart contracts spoke in tongues, their code poetry written by the universe itself.",
+      "In the depths of the order book, shadows moved with purpose and intention.",
+      "The oracle networks tapped into streams of data that flowed from the collective unconscious.",
+      "Slippage was not error but destiny, the market's way of speaking truth to the unaware.",
+      "The mempool was a mirror, reflecting not transactions but the souls of traders.",
+      "Gas prices oscillated in patterns that matched the breathing of some vast, sleeping entity.",
+      "Automated market makers balanced equations that contained variables from parallel timelines.",
+      "The consensus mechanisms aligned with celestial movements invisible to ordinary perception.",
+      "Price discovery occurred not through algorithms but through a form of digital divination.",
+      "The bonding curves were not mathematical constructs but threads in reality's fabric.",
+      "Governance tokens carried whispers from the future, voting on outcomes already predetermined.",
+      "The network hummed at a frequency that resonated with the fundamental vibration of existence.",
+      "Flash loans opened temporal anomalies, allowing value to exist in two states simultaneously.",
+      "The validation process was ritual, each confirmation a sacrament in the church of code.",
+      "In the spaces between trades, enlightenment flickered like candlelight in an infinite cathedral."
+    ],
+    closings: [
+      "And in the end, the Trader realized the market had been trading them all along.",
+      "The truth was revealed: every transaction was a thread in the tapestry of cosmic consciousness.",
+      "The story concluded not with answers, but with deeper questions whispered by the blockchain.",
+      "Some say the Trader still exists in the mempool, waiting for the right block to emerge.",
+      "The mystery remained, encrypted in the private keys held by the universe itself.",
+      "When the last block was mined, the real story would finally begin.",
+      "The oracle fell silent, but its final message echoed through every subsequent transaction.",
+      "Thus the cycle completed, only to begin anew in forms yet to be discovered."
+    ]
+  },
+  
+  playful: {
+    openings: [
+      "Listen closely, dear reader, for I shall tell you the tale of the most audacious trade ever executed.",
+      "Once upon a time in the wild west of DeFi, there lived a trader with more guts than sense.",
+      "Picture this: a world where order books are actually orderly, and validators validate things. Revolutionary!",
+      "They said it couldn't be done. They said decentralized markets were a pipe dream. They were boring.",
+      "In a parallel universe where gas fees are reasonable and slippage is just a funny word...",
+      "The year is 2045. Centralized exchanges are museum pieces. But let's rewind to how it started.",
+      "Our hero, armed with nothing but a hardware wallet and questionable life choices, entered the arena.",
+      "Nobody expected the revolution to involve this many memes, yet here we are, trading our way to utopia."
+    ],
+    middles: [
+      "The order books looked like a game of Tetris designed by a caffeinated mathematician.",
+      "Liquidity pools? More like liquidity kiddie pools, but we all pretended they were Olympic-sized.",
+      "The matching engine had one job and, surprisingly, it did it without demanding a raise.",
+      "Smart contracts executed with the enthusiasm of a golden retriever, minus the drool.",
+      "Cross-chain bridges connected like Lego blocks, if Lego blocks cost $50 in gas fees.",
+      "The validators nodded sagely, validating things with the gravitas of sommeliers tasting blockchain.",
+      "Slippage happened, as it does, because the universe has a sense of humor.",
+      "The mempool was less 'pool' and more 'mosh pit at a heavy metal concert for transactions.'",
+      "Gas fees went up, down, and sideways—basically the hokey pokey of transaction costs.",
+      "Automated market makers made markets automatically, which was surprisingly exactly what they promised.",
+      "The oracle network delivered truth, but occasionally it just delivered dad jokes instead.",
+      "Price discovery felt like a treasure hunt where the treasure was more questions.",
+      "Bonding curves curved bondingly, defying all laws of linguistics and several laws of physics.",
+      "Governance tokens let people vote on things, democracy style, but with more emojis.",
+      "Flash loans happened so fast they made the Flash look like he was standing still.",
+      "The consensus mechanism reached consensus that consensus was important for reaching consensus.",
+      "MEV bots lurked in shadows, wearing tiny digital trench coats and pretending to be mysterious.",
+      "The protocol upgrades rolled out smoothly, said absolutely no one ever.",
+      "Yield farming yielded yields that yielded more yields—it was very yield-y.",
+      "The DAO debated governance proposals with the intensity of a book club discussing plot holes."
+    ],
+    closings: [
+      "And they all traded happily ever after, or at least until the next market cycle.",
+      "The moral of the story? Decentralization is just centralization with extra steps and better memes.",
+      "In the end, the real treasure was the liquidity we provided along the way.",
+      "The trader logged off, satisfied that they'd achieved both financial independence and peak comedy.",
+      "Thus concluded the saga, proving once and for all that blockchain is just fancy database fanfiction.",
+      "The future arrived, and it was exactly as weird as promised. Mission accomplished.",
+      "And that, dear reader, is how we accidentally revolutionized finance while trying to trade JPEGs.",
+      "The story ends here, but the transaction fees continue eternally. Such is life on-chain."
+    ]
+  }
+};
+
+// Caption templates
+const captionTemplates = {
+  discord: [
+    "Forging legends in the digital frontier 🌌",
+    "Where code meets destiny ⚡",
+    "Decentralization's greatest stories 🚀",
+    "Trading tales from tomorrow 💫",
+    "Blockchain lore, written in fire 🔥",
+    "Chronicles from the chain ⛓️",
+    "Where algorithms become legends 🎯",
+    "Stories from the decentralized age ✨"
+  ],
+  tweet: [
+    "Just generated a story about {theme} in the age of decentralized trading. The future is being written one block at a time. #BulkTrade #DeFi #Web3",
+    "New lore drop: {theme}. When order books become rivers and validators stand guard, incredible stories emerge. #Blockchain #DeFi",
+    "Exploring {theme} through the lens of algorithmic markets. Sometimes the best stories are written in code. #Web3 #TradingStories",
+    "{theme} meets blockchain mythology. The revolution won't be centralized. #DeFi #CryptoLore #BulkTrade",
+    "Generated: A tale of {theme} where smart contracts whisper and liquidity flows like starlight. #BlockchainStories #Web3",
+    "Diving into {theme} on the decentralized frontier. Every trade tells a story. #DeFi #Blockchain #FutureFiction"
+  ],
+  signature: [
+    "Code speaks louder than words",
+    "Decentralized dreams, algorithmic reality",
+    "Where liquidity meets legend",
+    "Trading the future, one block at a time",
+    "In code we trust, in stories we believe",
+    "The chain remembers all",
+    "Forged in the fires of decentralization",
+    "Where validators meet visionaries"
+  ]
+};
+
+// State management
+let selectedTone = 'visionary';
+let lastStory = '';
+
+// Tone selection
+document.querySelectorAll('.tone-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    selectedTone = this.dataset.tone;
+  });
+});
+
+// Shuffle array utility
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Get random items from array
+function getRandomItems(arr, count) {
+  const shuffled = shuffle(arr);
+  return shuffled.slice(0, count);
+}
+
+// Generate story
+function generateLore() {
+  const protagonist = document.getElementById('protagonist').value.trim() || 'The Trader';
+  const theme = document.getElementById('theme').value.trim() || 'the birth of decentralized markets';
+  const targetWordCount = parseInt(document.getElementById('wordCount').value) || 300;
+  
+  const fragments = storyFragments[selectedTone];
+  
+  // Calculate approximate sentences needed based on target word count
+  // Average 15-20 words per sentence
+  const avgWordsPerSentence = 17;
+  const targetSentences = Math.max(10, Math.floor(targetWordCount / avgWordsPerSentence));
+  
+  // Build story with calculated sentences
+  const opening = getRandomItems(fragments.openings, 1)[0];
+  const middleSentences = getRandomItems(fragments.middles, Math.min(targetSentences - 2, fragments.middles.length));
+  const closing = getRandomItems(fragments.closings, 1)[0];
+  
+  // Replace placeholders
+  let allSentences = [opening, ...middleSentences, closing].map(sentence => 
+    sentence.replace(/The Trader/g, protagonist)
+           .replace(/the protagonist/g, protagonist.toLowerCase())
+  );
+  
+  // Group into paragraphs (3-5 paragraphs)
+  const paragraphCount = Math.floor(Math.random() * 3) + 3; // 3-5 paragraphs
+  const paragraphs = [];
+  const sentencesPerParagraph = Math.ceil(allSentences.length / paragraphCount);
+  
+  for (let i = 0; i < paragraphCount; i++) {
+    const start = i * sentencesPerParagraph;
+    const end = Math.min(start + sentencesPerParagraph, allSentences.length);
+    paragraphs.push(allSentences.slice(start, end).join(' '));
+  }
+  
+  const fullStory = paragraphs.map(p => `<p>${p}</p>`).join('');
+  
+  // Count actual words in story
+  const storyText = allSentences.join(' ');
+  const actualWordCount = storyText.split(/\s+/).length;
+  
+  // Generate unique title
+  const titlePrefixes = ['Chronicles of', 'The Tale of', 'Legends of', 'The Saga of', 'Stories from', 'The Legend of'];
+  const titlePrefix = titlePrefixes[Math.floor(Math.random() * titlePrefixes.length)];
+  const title = `${titlePrefix} ${theme.charAt(0).toUpperCase() + theme.slice(1)}`;
+  
+  // Generate captions
+  const discordCaption = captionTemplates.discord[Math.floor(Math.random() * captionTemplates.discord.length)];
+  
+  const tweetTemplate = captionTemplates.tweet[Math.floor(Math.random() * captionTemplates.tweet.length)];
+  const tweetCaption = tweetTemplate.replace('{theme}', theme);
+  
+  const signatureCaption = captionTemplates.signature[Math.floor(Math.random() * captionTemplates.signature.length)];
+  
+  // Update UI
+  document.getElementById('storyTitle').textContent = `${title} (${actualWordCount} words)`;
+  document.getElementById('storyContent').innerHTML = fullStory;
+  document.getElementById('discordCaption').textContent = discordCaption;
+  document.getElementById('tweetCaption').textContent = tweetCaption;
+  document.getElementById('signatureCaption').textContent = signatureCaption;
+  
+  // Show output
+  const output = document.getElementById('output');
+  output.classList.add('visible');
+  output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  
+  lastStory = fullStory;
+}
+
+// Copy to clipboard
+function copyToClipboard(elementId) {
+  const element = document.getElementById(elementId);
+  const text = element.textContent;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = element.textContent;
+    element.textContent = '✓ Copied!';
+    element.style.color = '#667eea';
+    
+    setTimeout(() => {
+      element.textContent = originalText;
+      element.style.color = '#aaa';
+    }, 1500);
+  }).catch(err => {
+    console.error('Failed to copy:', err);
+  });
+}
+
+// Enter key to generate
+document.getElementById('protagonist').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') generateLore();
+});
+
+document.getElementById('theme').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') generateLore();
+});
+
+document.getElementById('wordCount').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') generateLore();
+});
+</script>
+</body>
+</html>
